@@ -1,83 +1,125 @@
-import svelte from "rollup-plugin-svelte";
-import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
-import livereload from "rollup-plugin-livereload";
+import replace from "@rollup/plugin-replace";
+import commonjs from "@rollup/plugin-commonjs";
+import svelte from "rollup-plugin-svelte";
+import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
-import css from "rollup-plugin-css-only";
+import config from "sapper/config/rollup.js";
+import pkg from "./package.json";
 import { markdown } from "svelte-preprocess-markdown";
 
-const production = !process.env.ROLLUP_WATCH;
+const mode = process.env.NODE_ENV;
+const dev = mode === "development";
+const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 
-function serve() {
-  let server;
-
-  function toExit() {
-    if (server) server.kill(0);
-  }
-
-  return {
-    writeBundle() {
-      if (server) return;
-      server = require("child_process").spawn(
-        "npm",
-        ["run", "start", "--", "--dev"],
-        {
-          stdio: ["ignore", "inherit", "inherit"],
-          shell: true,
-        }
-      );
-
-      process.on("SIGTERM", toExit);
-      process.on("exit", toExit);
-    },
-  };
-}
+const onwarn = (warning, onwarn) =>
+  (warning.code === "MISSING_EXPORT" && /'preload'/.test(warning.message)) ||
+  (warning.code === "CIRCULAR_DEPENDENCY" &&
+    /[/\\]@sapper[/\\]/.test(warning.message)) ||
+  onwarn(warning);
 
 export default {
-  input: "src/main.js",
-  output: {
-    sourcemap: true,
-    format: "iife",
-    name: "app",
-    file: "public/build/bundle.js",
+  client: {
+    input: config.client.input(),
+    output: config.client.output(),
+    plugins: [
+      replace({
+        "process.browser": true,
+        "process.env.NODE_ENV": JSON.stringify(mode),
+      }),
+      svelte({
+        compilerOptions: {
+          dev,
+          hydratable: true,
+        },
+        extensions: [".svelte", ".md"],
+        preprocess: markdown(),
+      }),
+      resolve({
+        browser: true,
+        dedupe: ["svelte"],
+      }),
+      commonjs(),
+
+      legacy &&
+        babel({
+          extensions: [".js", ".mjs", ".html", ".svelte"],
+          babelHelpers: "runtime",
+          exclude: ["node_modules/@babel/**"],
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                targets: "> 0.25%, not dead",
+              },
+            ],
+          ],
+          plugins: [
+            "@babel/plugin-syntax-dynamic-import",
+            [
+              "@babel/plugin-transform-runtime",
+              {
+                useESModules: true,
+              },
+            ],
+          ],
+        }),
+
+      !dev &&
+        terser({
+          module: true,
+        }),
+    ],
+
+    preserveEntrySignatures: false,
+    onwarn,
   },
-  plugins: [
-    svelte({
-      extensions: [".svelte", ".md"],
-      preprocess: markdown(),
-      compilerOptions: {
-        // enable run-time checks when not in production
-        dev: !production,
-      },
-    }),
-    // we'll extract any component CSS out into
-    // a separate file - better for performance
-    css({ output: "bundle.css" }),
 
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration -
-    // consult the documentation for details:
-    // https://github.com/rollup/plugins/tree/master/packages/commonjs
-    resolve({
-      browser: true,
-      dedupe: ["svelte"],
-    }),
-    commonjs(),
+  server: {
+    input: config.server.input(),
+    output: config.server.output(),
+    plugins: [
+      replace({
+        "process.browser": false,
+        "process.env.NODE_ENV": JSON.stringify(mode),
+      }),
+      svelte({
+        compilerOptions: {
+          dev,
+          generate: "ssr",
+          hydratable: true,
+        },
+        emitCss: false,
+        extensions: [".svelte", ".md"],
+        preprocess: markdown(),
+      }),
+      resolve({
+        dedupe: ["svelte"],
+      }),
+      commonjs(),
+    ],
+    external: Object.keys(pkg.dependencies).concat(
+      require("module").builtinModules
+    ),
 
-    // In dev mode, call `npm run start` once
-    // the bundle has been generated
-    !production && serve(),
+    preserveEntrySignatures: "strict",
+    onwarn,
+  },
 
-    // Watch the `public` directory and refresh the
-    // browser on changes when not in production
-    !production && livereload("public"),
+  serviceworker: {
+    input: config.serviceworker.input(),
+    output: config.serviceworker.output(),
+    plugins: [
+      resolve(),
+      replace({
+        "process.browser": true,
+        "process.env.NODE_ENV": JSON.stringify(mode),
+      }),
+      commonjs(),
+      !dev && terser(),
+    ],
 
-    // If we're building for production (npm run build
-    // instead of npm run dev), minify
-    production && terser(),
-  ],
-  watch: {
-    clearScreen: false,
+    preserveEntrySignatures: false,
+    onwarn,
   },
 };

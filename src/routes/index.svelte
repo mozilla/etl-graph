@@ -1,11 +1,11 @@
 <script>
   import { onMount } from "svelte";
-  import { transform, getNode } from "./utils.js";
-  import FrontMatter from "./FrontMatter.md";
-  import Network from "./Network.svelte";
-  import Summary from "./Summary.svelte";
-  import { redraw } from "./store.js";
-  import SearchBox from "./SearchBox.svelte";
+  import { redraw } from "../store.js";
+  import { transform, getNode } from "../utils.js";
+  import FrontMatter from "../components/FrontMatter.md";
+  import Network from "../components/Network.svelte";
+  import Summary from "../components/Summary.svelte";
+  import SearchBox from "../components/SearchBox.svelte";
 
   let edges;
   let includeDatasetNodes = true;
@@ -35,6 +35,10 @@
     margin: 0 auto;
   }
 </style>
+
+<svelte:head>
+  <title>BigQuery ETL Query Network</title>
+</svelte:head>
 
 <div id="container">
   <h1>BigQuery ETL Query Network</h1>
