@@ -29,38 +29,25 @@
   });
 </script>
 
-<style type="text/css">
-  #container {
-    width: 900px;
-    margin: 0 auto;
-  }
-</style>
+<h1>BigQuery ETL Query Network</h1>
 
-<svelte:head>
-  <title>BigQuery ETL Query Network</title>
-</svelte:head>
+<FrontMatter />
 
-<div id="container">
-  <h1>BigQuery ETL Query Network</h1>
+{#if data && selectedNode}
+  <h2>Search Box</h2>
+  <SearchBox {data} bind:root={selectedNode} />
 
-  <FrontMatter />
+  <h2>Network</h2>
+  <p>
+    Scroll and drag to navigate the network. Selecting a node by clicking will
+    show summary information about the table or dataset. Double click a node to
+    center the network. By default, only neighboring nodes will be shown in the
+    sub-network.
+  </p>
+  <label><input type="checkbox" bind:checked={includeDatasetNodes} />include
+    dataset</label>
+  <Network {data} bind:network bind:selectedNode />
 
-  {#if data && selectedNode}
-    <h2>Search Box</h2>
-    <SearchBox {data} bind:root={selectedNode} />
-
-    <h2>Network</h2>
-    <p>
-      Scroll and drag to navigate the network. Selecting a node by clicking will
-      show summary information about the table or dataset. Double click a node
-      to center the network. By default, only neighboring nodes will be shown in
-      the sub-network.
-    </p>
-    <label><input type="checkbox" bind:checked={includeDatasetNodes} />include
-      dataset</label>
-    <Network {data} bind:network bind:selectedNode />
-
-    <h2>Summary</h2>
-    <Summary {data} {network} bind:root={selectedNode} />
-  {/if}
-</div>
+  <h2>Summary</h2>
+  <Summary {data} {network} bind:root={selectedNode} />
+{/if}
