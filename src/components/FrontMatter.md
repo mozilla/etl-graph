@@ -1,5 +1,3 @@
-_Created 2020-06-18. Updated 2021-01-14_
-
 This network represents the relationships between tables in BigQuery. Each blue
 node represents a table, while each orange node represents a dataset. The
 network was created by scraping the BigQuery `TABLES` and `JOBS_BY_PROJECT`

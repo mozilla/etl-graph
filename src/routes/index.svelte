@@ -29,8 +29,6 @@
   });
 </script>
 
-<h1>BigQuery ETL Query Network</h1>
-
 <FrontMatter />
 
 {#if data && selectedNode}
