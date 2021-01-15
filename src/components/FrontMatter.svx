@@ -5,7 +5,6 @@ tables in the `INFORMATION_SCHEMA` dataset. Views are resolved using bq with
 `--dry_run`.
 
 The source can be found at
-[acmiyaguchi/etl-graph](https://github.com/acmiyaguchi/etl-graph). See
-[NOTES.md](https://github.com/acmiyaguchi/etl-graph/blob/main/README.md) for an
-overview of development. This visualizaton is powered by
+[acmiyaguchi/etl-graph](https://github.com/acmiyaguchi/etl-graph). See the
+[notes](/notes) for an overview of development. This visualizaton is powered by
 [vis-network](https://visjs.github.io/vis-network/docs/network/).
