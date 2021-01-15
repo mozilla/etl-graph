@@ -1,5 +1,5 @@
 <script>
-    import Notes from "./Notes.md";
+    import Notes from "./Notes.svx";
 </script>
 
 <Notes />

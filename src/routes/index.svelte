@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { redraw } from "../store.js";
   import { transform, getNode } from "../utils.js";
-  import FrontMatter from "../components/FrontMatter.md";
+  import FrontMatter from "../components/FrontMatter.svx";
   import Network from "../components/Network.svelte";
   import Summary from "../components/Summary.svelte";
   import SearchBox from "../components/SearchBox.svelte";

@@ -1,5 +1,7 @@
 # Notes
 
+_Written 2020-06-18_
+
 Let's build a network of the relationships between tables in BigQuery. The
 catalog of datasets and tables keeps growing, but our understanding of the
 relationships between them is opaque. The goal is to explore the different ways
