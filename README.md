@@ -1,5 +1,7 @@
 # etl-graph
 
+**This repository now lives in [docker-etl/jobs/etl-graph](https://github.com/mozilla/docker-etl/tree/main/jobs/etl-graph). This repository has been archived for documentation purposes.**
+
 Queries and visualization around BigQuery usage.
 
 ![screenshot](screenshot.png)
